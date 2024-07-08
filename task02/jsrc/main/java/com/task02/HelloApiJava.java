@@ -49,21 +49,21 @@ public class HelloApiJava implements RequestHandler<APIGatewayV2HTTPEvent, APIGa
     }
 
     private APIGatewayV2HTTPResponse handleGetRoot(APIGatewayV2HTTPEvent requestEvent) {
-        return buildResponse(SC_OK, ("Use the path /hello to get greetings message"));
+        return buildResponse(SC_OK, new Body(200, "Use the path /hello to get greetings message"));
     }
 
     private APIGatewayV2HTTPResponse handleGetHello(APIGatewayV2HTTPEvent requestEvent) {
-        return buildResponse(SC_OK, "Hello from Lambda");
+        return buildResponse(SC_OK, new Body(200, "Hello from Lambda"));
     }
 
     private APIGatewayV2HTTPResponse notFoundResponse(APIGatewayV2HTTPEvent requestEvent) {
-        return buildResponse(SC_NOT_FOUND, "The resource with method %s and path %s is not found".formatted(
+        return buildResponse(SC_NOT_FOUND, new Body(400, "The resource with method %s and path %s is not found".formatted(
                 getMethod(requestEvent),
                 getPath(requestEvent)
-        ));
+        )));
     }
 
-    private APIGatewayV2HTTPResponse buildResponse(int statusCode, String body) {
+    private APIGatewayV2HTTPResponse buildResponse(int statusCode, Body body) {
         return APIGatewayV2HTTPResponse.builder()
                 .withStatusCode(statusCode)
                 .withHeaders(responseHeaders)
@@ -86,4 +86,7 @@ public class HelloApiJava implements RequestHandler<APIGatewayV2HTTPEvent, APIGa
 
     private record RouteKey(String method, String path) {
     }
+    
+     private record Body(Integer statusCode, String mensaje) {
+     }
 }
