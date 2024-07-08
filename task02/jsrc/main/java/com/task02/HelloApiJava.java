@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-@LambdaHandler(lambdaName = "hello_api_java",
-	roleName = "hello_api_java-role",
+@LambdaHandler(lambdaName = "hello_world",
+	roleName = "hello_world-role",
 	isPublishVersion = true,
     runtime = DeploymentRuntime.JAVA17,
 	aliasName = "${lambdas_alias_name}",

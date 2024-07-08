@@ -1,6 +1,6 @@
 {
-  "hello_api_java" : {
-    "name" : "hello_api_java",
+  "hello_world" : {
+    "name" : "hello_world",
     "lambda_path" : "/Users/jrodriguez3/Repos/epam_syndicate/task02",
     "version" : "1.0.0",
     "func_name" : "com.task02.HelloApiJava",
@@ -8,7 +8,7 @@
     "resource_type" : "lambda",
     "runtime" : "java17",
     "architectures" : [ "x86_64" ],
-    "iam_role_name" : "hello_api_java-role",
+    "iam_role_name" : "hello_world-role",
     "memory" : 1024,
     "timeout" : 300,
     "subnet_ids" : [ ],
