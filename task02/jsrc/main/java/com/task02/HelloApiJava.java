@@ -87,6 +87,6 @@ public class HelloApiJava implements RequestHandler<APIGatewayV2HTTPEvent, APIGa
     private record RouteKey(String method, String path) {
     }
     
-     private record Body(Integer statusCode, String mensaje) {
+     private record Body(Integer statusCode, String message) {
      }
 }
