@@ -56,9 +56,9 @@ public class HelloApiJava implements RequestHandler<APIGatewayV2HTTPEvent, APIGa
     }
 
     private APIGatewayV2HTTPResponse notFoundResponse(APIGatewayV2HTTPEvent requestEvent) {
-        return buildResponse(SC_NOT_FOUND, new Body(400, "The resource with method %s and path %s is not found".formatted(
-                getMethod(requestEvent),
-                getPath(requestEvent)
+        return buildResponse(SC_NOT_FOUND, new Body(400, "Bad request syntax or unsupported method. Request path: {%s}. HTTP method: {%s}".formatted(
+                getPath(requestEvent),
+                getMethod(requestEvent)
         )));
     }
 
