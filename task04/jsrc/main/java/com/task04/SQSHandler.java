@@ -19,7 +19,7 @@ import com.syndicate.deployment.model.RetentionSetting;
 
 @LambdaHandler(lambdaName = "sqs_handler",
 	roleName = "sqs_handler-role",
-	isPublishVersion = true,
+	isPublishVersion = false,
     timeout=30,
     runtime = DeploymentRuntime.JAVA17,
 	logsExpiration = RetentionSetting.SYNDICATE_ALIASES_SPECIFIED

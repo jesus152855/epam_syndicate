@@ -21,7 +21,7 @@ import java.util.List;
 
 @LambdaHandler(lambdaName = "sns_handler",
 	roleName = "sns_handler-role",
-	isPublishVersion = true,
+	isPublishVersion = false,
     runtime = DeploymentRuntime.JAVA17,
 	logsExpiration = RetentionSetting.SYNDICATE_ALIASES_SPECIFIED
 )
