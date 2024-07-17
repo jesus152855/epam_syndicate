@@ -29,4 +29,5 @@ build
 **/build/
 **/node_modules
 **/target/
-
+**/syndicate.yml
+**/bundles
