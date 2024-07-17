@@ -23,6 +23,10 @@
 hs_err_pid*
 replay_pid*
 
-*/target/*
-*/idea/*
+.idea/
+**/*.iml
+build
+**/build/
+**/node_modules
+**/target/
 
