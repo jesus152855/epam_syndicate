@@ -7,7 +7,6 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.syndicate.deployment.annotations.environment.EnvironmentVariable;
 import com.syndicate.deployment.annotations.environment.EnvironmentVariables;
@@ -49,13 +48,21 @@ public class DynamoDBHandler implements RequestHandler<APIGatewayV2HTTPEvent, AP
         return buildResponse(500, null);
     }
 
-    private void persistData(Event event) throws JsonProcessingException {
+    private void persistData(Event event) {
         var attributesMap = new HashMap<String, AttributeValue>();
         attributesMap.put("id", new AttributeValue(String.valueOf(event.id())));
         attributesMap.put("principalId", new AttributeValue().withN(String.valueOf(event.principalId())));
-        attributesMap.put("body", new AttributeValue("'content'" + " " + objectMapper.writeValueAsString(event.body())));
+        attributesMap.put("body", new AttributeValue().withM(buildBodyValue(event)));
         attributesMap.put("createdAt", new AttributeValue(String.valueOf(event.createdAt())));
         amazonDynamoDB.putItem(System.getenv("table"), attributesMap);
+    }
+
+    private Map<String, AttributeValue> buildBodyValue(Event event) {
+        var attributesMap = new HashMap<String, AttributeValue>();
+        for(Map.Entry<String, String> entry: event.body().entrySet()) {
+           attributesMap.put(entry.getKey(), new AttributeValue(entry.getValue()));
+        }
+        return attributesMap;
     }
 
     private APIGatewayV2HTTPResponse buildResponse(Integer statusCode, Event event) {
