@@ -27,7 +27,6 @@ import java.util.*;
 )
 @EnvironmentVariables(value = {
         @EnvironmentVariable(key = "region", value = "${region}"),
-        @EnvironmentVariable(key = "sourceTable", value = "${source_table}"),
         @EnvironmentVariable(key = "targetTable", value = "${target_table}")})
 @DynamoDbTriggerEventSource(targetTable = "${source_table}", batchSize = 10)
 public class AuditProducerHandler implements RequestHandler<DynamodbEvent, Void> {
