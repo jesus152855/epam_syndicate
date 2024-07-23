@@ -6,8 +6,6 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.DynamodbEvent;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.syndicate.deployment.annotations.environment.EnvironmentVariable;
 import com.syndicate.deployment.annotations.environment.EnvironmentVariables;
 import com.syndicate.deployment.annotations.events.DynamoDbTriggerEventSource;
@@ -29,8 +27,6 @@ import java.util.*;
         @EnvironmentVariable(key = "targetTable", value = "${target_table}")})
 @DynamoDbTriggerEventSource(targetTable = "Configuration", batchSize = 10)
 public class AuditProducerHandler implements RequestHandler<DynamodbEvent, Void> {
-
-    private final ObjectMapper mapper = new ObjectMapper();
 
     private final AmazonDynamoDB amazonDynamoDB = AmazonDynamoDBClientBuilder.standard().withRegion(System.getenv("region")).build();
 
@@ -62,12 +58,12 @@ public class AuditProducerHandler implements RequestHandler<DynamodbEvent, Void>
                 Integer.parseInt(attributeValueOld));
     }
 
-    private void persistData(AuditEvent auditEvent) throws JsonProcessingException {
+    private void persistData(AuditEvent auditEvent) {
         var attributesMap = new HashMap<String, AttributeValue>();
         attributesMap.put("id", new AttributeValue(String.valueOf(auditEvent.id())));
         attributesMap.put("itemKey", new AttributeValue(String.valueOf(auditEvent.itemKey())));
         attributesMap.put("modificationTime", new AttributeValue(String.valueOf(auditEvent.modificationTime())));
-        attributesMap.put("newValue", new AttributeValue(mapper.writeValueAsString(auditEvent.configuration())));
+        attributesMap.put("newValue", new AttributeValue().withM(buildBodyValue(auditEvent)));
         if(Objects.nonNull(auditEvent.oldValue())) {
             attributesMap.put("updatedAttribute", new AttributeValue(String.valueOf(auditEvent.updatedAttribute())));
             attributesMap.put("oldValue", new AttributeValue().withN(String.valueOf(auditEvent.oldValue())));
@@ -75,6 +71,12 @@ public class AuditProducerHandler implements RequestHandler<DynamodbEvent, Void>
         }
         System.out.println("Event to persist: " + attributesMap);
         amazonDynamoDB.putItem(System.getenv("targetTable"), attributesMap);
+    }
+
+    private Map<String, AttributeValue> buildBodyValue(AuditEvent auditEvent) {
+        var attributesMap = new HashMap<String, AttributeValue>();
+        attributesMap.put(auditEvent.configuration().key(), new AttributeValue().withN(String.valueOf(auditEvent.configuration().value())));
+        return attributesMap;
     }
 
     private record AuditEvent(String id, String itemKey, String modificationTime, String updatedAttribute, Configuration configuration, Integer oldValue) {
