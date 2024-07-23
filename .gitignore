@@ -31,3 +31,4 @@ build
 **/target/
 **/syndicate.yml
 **/bundles
+.DS_Store
