@@ -28,7 +28,7 @@ import java.util.*;
 @EnvironmentVariables(value = {
         @EnvironmentVariable(key = "region", value = "${region}"),
         @EnvironmentVariable(key = "targetTable", value = "${target_table}")})
-@DynamoDbTriggerEventSource(targetTable = "${source_table}", batchSize = 10)
+@DynamoDbTriggerEventSource(targetTable = "Configuration", batchSize = 10)
 public class AuditProducerHandler implements RequestHandler<DynamodbEvent, Void> {
 
 	private final AmazonDynamoDB amazonDynamoDB = AmazonDynamoDBClientBuilder.standard().withRegion(System.getenv("region")).build();
