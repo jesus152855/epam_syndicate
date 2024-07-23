@@ -75,7 +75,8 @@ public class AuditProducerHandler implements RequestHandler<DynamodbEvent, Void>
 
     private Map<String, AttributeValue> buildBodyValue(AuditEvent auditEvent) {
         var attributesMap = new HashMap<String, AttributeValue>();
-        attributesMap.put(auditEvent.configuration().key(), new AttributeValue().withN(String.valueOf(auditEvent.configuration().value())));
+        attributesMap.put("key", new AttributeValue(auditEvent.configuration().key()));
+        attributesMap.put("value", new AttributeValue().withN(String.valueOf(auditEvent.configuration().value())));
         return attributesMap;
     }
 
