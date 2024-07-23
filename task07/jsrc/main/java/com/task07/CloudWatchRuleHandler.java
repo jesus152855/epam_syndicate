@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 @EnvironmentVariables(value = {
         @EnvironmentVariable(key = "region", value = "${region}"),
         @EnvironmentVariable(key = "targetBucket", value = "${target_bucket}")})
-@RuleEventSource(targetRule = "${source_rule}")
+@RuleEventSource(targetRule = "uuid_trigger")
 public class CloudWatchRuleHandler implements RequestHandler<ScheduledEvent, List<String>> {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
