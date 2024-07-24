@@ -88,7 +88,7 @@ public class WeatherHandler implements RequestHandler<Void, String> {
         var attributesMapHourlyUnits = new HashMap<String, AttributeValue>();
         attributesMapHourlyUnits.put("temperature_2m", new AttributeValue(weatherResponse.hourly_units().temperature_2m()));
         attributesMapHourlyUnits.put("time", new AttributeValue(weatherResponse.hourly_units().time()));
-        attributesMapHourlyUnits.put("hourly_units", new AttributeValue().withM(attributesMapHourlyUnits));
+        attributesMapForecast.put("hourly_units", new AttributeValue().withM(attributesMapHourlyUnits));
 
         attributesMapForecast.put("latitude", new AttributeValue().withN(String.valueOf(weatherResponse.latitude())));
         attributesMapForecast.put("longitude", new AttributeValue().withN(String.valueOf(weatherResponse.longitude())));
