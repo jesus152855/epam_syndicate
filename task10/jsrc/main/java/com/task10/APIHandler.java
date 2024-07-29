@@ -77,26 +77,26 @@ public class APIHandler implements RequestHandler<APIHandler.APIRequest, APIGate
 
     private Table buildTableObject(APIRequest apiRequest) {
         System.out.println("Calling buildTableObject ..." );
-        return new Table(apiRequest.body_json().get("id"), apiRequest.body_json().get("number"),
-                apiRequest.body_json().get("places"), Boolean.valueOf(apiRequest.body_json().get("isVip")),
-                apiRequest.body_json().get("minOrder"));
+        return new Table(Integer.valueOf(apiRequest.body_json().get("id")), Integer.valueOf(apiRequest.body_json().get("number")),
+                Integer.valueOf(apiRequest.body_json().get("places")), Boolean.valueOf(apiRequest.body_json().get("isVip")),
+                Integer.valueOf(apiRequest.body_json().get("minOrder")));
     }
 
     private Reservation buildReservationObject(APIRequest apiRequest) {
         System.out.println("Calling buildReservationObject ..." );
-        return new Reservation(apiRequest.body_json().get("tableNumber"), apiRequest.body_json().get("clientName"),
+        return new Reservation(Integer.valueOf(apiRequest.body_json().get("tableNumber")), apiRequest.body_json().get("clientName"),
                 apiRequest.body_json().get("phoneNumber"), apiRequest.body_json().get("date"),
                 apiRequest.body_json().get("slotTimeStart"), apiRequest.body_json().get("slotTimeEnd"));
     }
 
     private Table buildTableResponse(Map<String, AttributeValue> result) {
-        return new Table(result.get("id").getN(), result.get("number").getN(), result.get("places").getN(),
-                result.get("isVip").getBOOL(),
-                Objects.nonNull(result.get("minOrder")) ? (result.get("minOrder").getN()) : null);
+        return new Table(Integer.valueOf(result.get("id").getN()), Integer.valueOf(result.get("number").getN()),
+                Integer.valueOf(result.get("places").getN()), result.get("isVip").getBOOL(),
+                Objects.nonNull(result.get("minOrder")) ? (Integer.valueOf(result.get("minOrder").getN())) : null);
     }
 
     private Reservation buildReservationResponse(Map<String, AttributeValue> result) {
-        return new Reservation(result.get("tableNumber").getN(), result.get("clientName").getS(), result.get("phoneNumber").getS(),
+        return new Reservation(Integer.valueOf(result.get("tableNumber").getN()), result.get("clientName").getS(), result.get("phoneNumber").getS(),
                 result.get("date").getS(), result.get("slotTimeStart").getS(), result.get("slotTimeEnd").getS());
     }
 
@@ -192,7 +192,7 @@ public class APIHandler implements RequestHandler<APIHandler.APIRequest, APIGate
             attributesMap.put("places", new AttributeValue().withN(String.valueOf(table.places())));
             attributesMap.put("isVip", new AttributeValue().withBOOL(table.isVip()));
             if (Objects.nonNull(table.minOrder())) {
-                attributesMap.put("minOrder", new AttributeValue().withN(table.minOrder()));
+                attributesMap.put("minOrder", new AttributeValue().withN(String.valueOf(table.minOrder())));
             }
             amazonDynamoDB.putItem(System.getenv("tables_table"), attributesMap);
             return APIGatewayV2HTTPResponse.builder().withStatusCode(200).withBody(String.valueOf(table.id())).build();
@@ -245,31 +245,51 @@ public class APIHandler implements RequestHandler<APIHandler.APIRequest, APIGate
     private APIGatewayV2HTTPResponse persistReservation(Reservation reservation) {
         System.out.println("Calling persistReservation ..." );
         try {
-            var attributesMap = new HashMap<String, AttributeValue>();
-            attributesMap.put("id", new AttributeValue(UUID.randomUUID().toString()));
-            attributesMap.put("tableNumber", new AttributeValue().withN(String.valueOf(reservation.tableNumber())));
-            attributesMap.put("clientName", new AttributeValue(String.valueOf(reservation.clientName())));
-            attributesMap.put("phoneNumber", new AttributeValue(String.valueOf(reservation.phoneNumber())));
-            attributesMap.put("date", new AttributeValue(reservation.date()));
-            attributesMap.put("slotTimeStart", new AttributeValue(String.valueOf(reservation.slotTimeStart())));
-            attributesMap.put("slotTimeEnd", new AttributeValue(String.valueOf(reservation.slotTimeEnd())));
-            amazonDynamoDB.putItem(System.getenv("reservations_table"), attributesMap);
-            return APIGatewayV2HTTPResponse.builder().withStatusCode(200).withBody(UUID.randomUUID().toString()).build();
+            if(validateTable(reservation) && validateReservation(reservation)) {
+                var attributesMap = new HashMap<String, AttributeValue>();
+                attributesMap.put("id", new AttributeValue(UUID.randomUUID().toString()));
+                attributesMap.put("tableNumber", new AttributeValue().withN(String.valueOf(reservation.tableNumber())));
+                attributesMap.put("clientName", new AttributeValue(String.valueOf(reservation.clientName())));
+                attributesMap.put("phoneNumber", new AttributeValue(String.valueOf(reservation.phoneNumber())));
+                attributesMap.put("date", new AttributeValue(reservation.date()));
+                attributesMap.put("slotTimeStart", new AttributeValue(String.valueOf(reservation.slotTimeStart())));
+                attributesMap.put("slotTimeEnd", new AttributeValue(String.valueOf(reservation.slotTimeEnd())));
+                amazonDynamoDB.putItem(System.getenv("reservations_table"), attributesMap);
+                return APIGatewayV2HTTPResponse.builder().withStatusCode(200).withBody(UUID.randomUUID().toString()).build();
+            } else {
+                return APIGatewayV2HTTPResponse.builder().withStatusCode(400).withBody("ERROR, there is already a reservation or the table does not exist").build();
+            }
         } catch(Exception e) {
             System.err.println("Error while persisting reservation " + e.getMessage());
             return APIGatewayV2HTTPResponse.builder().withStatusCode(400).withBody("ERROR " + e.getMessage()).build();
         }
     }
 
+    private boolean validateTable(Reservation reservation) {
+        var checkTable = findTable(String.valueOf(reservation.tableNumber()));
+        return checkTable.getStatusCode() == 200;
+    }
+
+    private boolean validateReservation(Reservation reservation) {
+        var reservationList = amazonDynamoDB.scan(new ScanRequest(System.getenv("reservations_table")))
+                .getItems().stream().map(this::buildReservationResponse)
+                .filter(value ->
+                        value.tableNumber().equals(reservation.tableNumber()) && value.slotTimeStart().equals(reservation.slotTimeStart())
+                                && value.slotTimeEnd().equals(reservation.slotTimeEnd())).count();
+        return reservationList == 0;
+    }
+
+
+
     public record APIRequest(String method, String path, String authorization_header, Map<String, String> body_json) {
 
     }
 
-    public record Table(String id, String number, String places, Boolean isVip, String minOrder){
+    public record Table(Number id, Number number, Number places, Boolean isVip, Number minOrder){
 
     }
 
-    public record Reservation(String tableNumber, String clientName, String phoneNumber, String date, String slotTimeStart, String slotTimeEnd) {
+    public record Reservation(Number tableNumber, String clientName, String phoneNumber, String date, String slotTimeStart, String slotTimeEnd) {
 
     }
 
