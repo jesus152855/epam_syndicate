@@ -53,16 +53,16 @@ public class APIHandler implements RequestHandler<APIHandler.APIRequest, APIGate
                 yield signInUser(requestEvent, userPoolId, clientId);
             }
             case "/tables" -> {
-                var tableObject = buildTableObject(requestEvent);
                 if(requestEvent.method().equals("POST")) {
+                    var tableObject = buildTableObject(requestEvent);
                     yield persistTable(tableObject);
                 } else {
                     yield scanTable();
                 }
             }
             case "/reservations" -> {
-                var reservationObject = buildReservationObject(requestEvent);
                 if(requestEvent.method().equals("POST")) {
+                    var reservationObject = buildReservationObject(requestEvent);
                     yield persistReservation(reservationObject);
                 } else {
                     yield scanReservations();
@@ -79,7 +79,7 @@ public class APIHandler implements RequestHandler<APIHandler.APIRequest, APIGate
         System.out.println("Calling buildTableObject ..." );
         return new Table(Integer.valueOf(apiRequest.body_json().get("id")), Integer.valueOf(apiRequest.body_json().get("number")),
                 Integer.valueOf(apiRequest.body_json().get("places")), Boolean.valueOf(apiRequest.body_json().get("isVip")),
-                Integer.valueOf(apiRequest.body_json().get("minOrder")));
+                Objects.nonNull(apiRequest.body_json().get("minOrder")) ? Integer.parseInt(apiRequest.body_json().get("minOrder")) : null);
     }
 
     private Reservation buildReservationObject(APIRequest apiRequest) {
@@ -224,7 +224,7 @@ public class APIHandler implements RequestHandler<APIHandler.APIRequest, APIGate
             System.out.println("Table find result: " + result);
             return APIGatewayV2HTTPResponse.builder().withStatusCode(200).withBody(objectMapper.writeValueAsString(tableResult)).build();
         } catch (Exception e) {
-            System.err.println("Error while scanning table " + e.getMessage());
+            System.err.println("Error while finding table " + e.getMessage());
             return APIGatewayV2HTTPResponse.builder().withStatusCode(400).withBody("ERROR " + e.getMessage()).build();
         }
     }
@@ -267,6 +267,7 @@ public class APIHandler implements RequestHandler<APIHandler.APIRequest, APIGate
 
     private boolean validateTable(Reservation reservation) {
         var checkTable = findTable(String.valueOf(reservation.tableNumber()));
+        System.out.println("Validate table:" + checkTable.getStatusCode());
         return checkTable.getStatusCode() == 200;
     }
 
@@ -276,6 +277,7 @@ public class APIHandler implements RequestHandler<APIHandler.APIRequest, APIGate
                 .filter(value ->
                         value.tableNumber().equals(reservation.tableNumber()) && value.slotTimeStart().equals(reservation.slotTimeStart())
                                 && value.slotTimeEnd().equals(reservation.slotTimeEnd())).count();
+        System.out.println("Validate reservation:" + reservationList);
         return reservationList == 0;
     }
 
