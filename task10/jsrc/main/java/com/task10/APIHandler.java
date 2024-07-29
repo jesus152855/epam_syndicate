@@ -246,6 +246,7 @@ public class APIHandler implements RequestHandler<APIHandler.APIRequest, APIGate
         System.out.println("Calling persistReservation ..." );
         try {
             var attributesMap = new HashMap<String, AttributeValue>();
+            attributesMap.put("id", new AttributeValue(UUID.randomUUID().toString()));
             attributesMap.put("tableNumber", new AttributeValue().withN(String.valueOf(reservation.tableNumber())));
             attributesMap.put("clientName", new AttributeValue(String.valueOf(reservation.clientName())));
             attributesMap.put("phoneNumber", new AttributeValue(String.valueOf(reservation.phoneNumber())));
