@@ -196,7 +196,7 @@
             {
               "status_code": "200",
               "response_templates": {
-                "application/json": "#set($inputRoot = $input.path('$'))\n$input.path('$.body')\n#if($inputRoot.toString().contains(\"ERROR\"))\n    #set($context.responseOverride.status = 400)\n#end"
+                "application/json": "#set($inputRoot = $input.path('$'))$input.path('$.body')#if($inputRoot.toString().contains(\"ERROR\"))\n    #set($context.responseOverride.status = 400)\n#end"
               }
             }
           ],
@@ -216,7 +216,7 @@
             {
               "status_code": "200",
               "response_templates": {
-                "application/json": "#set($inputRoot = $input.path('$'))\n{\"id\": \"$input.path('$.body')\n#if($inputRoot.toString().contains('ERROR'))\n    #set($context.responseOverride.status = 400)\n#end}"
+                "application/json": "#set($inputRoot = $input.path('$'))\n{\"id\": \"$input.path('$.body')\"#if($inputRoot.toString().contains('ERROR'))\n    #set($context.responseOverride.status = 400)\n#end}"
               }
             }
           ],
@@ -239,7 +239,7 @@
             {
               "status_code": "200",
               "response_templates": {
-                "application/json": "#set($inputRoot = $input.path('$'))\n$input.path('$.body')\n#if($inputRoot.toString().contains(\"ERROR\"))\n    #set($context.responseOverride.status = 400)\n#end"
+                "application/json": "#set($inputRoot = $input.path('$'))$input.path('$.body')#if($inputRoot.toString().contains(\"ERROR\"))\n    #set($context.responseOverride.status = 400)\n#end"
               }
             }
           ],
@@ -259,7 +259,7 @@
             {
               "status_code": "200",
               "response_templates": {
-                "application/json": "#set($inputRoot = $input.path('$'))\n{\"reservationId\": \"$input.path('$.body')\n#if($inputRoot.toString().contains('ERROR'))\n    #set($context.responseOverride.status = 400)\n#end}"
+                "application/json": "#set($inputRoot = $input.path('$')){\"reservationId\": \"$input.path('$.body')\"#if($inputRoot.toString().contains('ERROR'))\n    #set($context.responseOverride.status = 400)\n#end}"
               }
             }
           ],
