@@ -266,9 +266,10 @@ public class APIHandler implements RequestHandler<APIHandler.APIRequest, APIGate
     }
 
     private boolean validateTable(Reservation reservation) {
-        var checkTable = findTable(String.valueOf(reservation.tableNumber()));
-        System.out.println("Validate table:" + checkTable.getStatusCode());
-        return checkTable.getStatusCode() == 200;
+        var tableList = amazonDynamoDB.scan(new ScanRequest(System.getenv("tables_table")))
+                .getItems().stream().map(this::buildTableResponse).filter(value -> reservation.tableNumber().equals(value.number())).count();
+        System.out.println("Validate table:" + tableList);
+        return tableList == 1;
     }
 
     private boolean validateReservation(Reservation reservation) {
