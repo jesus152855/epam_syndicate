@@ -103,7 +103,7 @@
             }
           },
           "requestTemplates": {
-            "application/json": "{\"method\": \"$context.httpMethod\", \"path\": \"$context.resourcePath\", \"authorization_header\": \"$input.params('id')\", \"body_json\": $input.json('$')}"
+            "application/json": "{\"method\": \"$context.httpMethod\", \"path\": \"$context.resourcePath\", \"authorization_header\": \"$input.params('tableId')\", \"body_json\": $input.json('$')}"
           },
           "passthroughBehavior": "when_no_match",
           "type": "aws"
