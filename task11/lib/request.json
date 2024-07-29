@@ -1,0 +1,11 @@
+{
+  "method": "POST",
+  "path": "/signup",
+  "authorization_header": "testId",
+  "body_json": {
+    "firstName": "Jesus",
+    "lastName": "Rodriguez",
+    "email": "test@hotmail.com",
+    "password": "test"
+  }
+}
