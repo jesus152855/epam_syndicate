@@ -15,13 +15,13 @@
     }
   ],
   "paths": {
-    "/tables/{id}": {
+    "/tables/{tableId}": {
       "get": {
         "summary": "Finds tables by id",
         "description": "Finds tables by id",
         "parameters": [
           {
-            "name": "id",
+            "name": "tableId",
             "in": "path",
             "required": true,
             "schema": {
