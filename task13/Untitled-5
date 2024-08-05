@@ -1,0 +1,38 @@
+import json
+import boto3
+client = boto3.client('dynamodb')
+def lambda_handler(event, context):
+    PutItemProduct = client.put_item(
+        TableName='Products',
+        Item={
+            'id': {
+              'S': '01'
+            },
+            'title': {
+              'S': 'Dummy record'
+            },
+            'description': {
+              'S': 'Hardcoded dynamodb entry'
+            },
+            'price': {
+              'N': '10'
+            }
+        }
+      )
+    
+    PutItemStocks = client.put_item(
+        TableName='Stocks',
+        Item={
+            'product_id': {
+              'S': '01'
+            },
+            'count': {
+              'N': '1'
+            }
+        }
+      )
+    response = {
+      'statusCode': 200,
+      'body': json.dumps(PutItem)
+    }
+    return response</code>
